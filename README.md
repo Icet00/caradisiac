@@ -33,7 +33,7 @@ The api
 
 * must listen port `9292`
 * must provide endpoint `/populate` to index records to Elasticsearch
-* must provide endpoint `/suv` that return list of paginated higher rate and higher volume suv
+* must provide endpoint `/suv` that return list of cars with the higher car boot volume
 
 ## How to do that?
 
@@ -91,8 +91,8 @@ Node.js + ES6 + Elasticsearch
 
 ## MVP
 
-1. Build an api that provide endpoint `/populate`
-1. Build an api that provide endpoint `/suv`
+1. Build an api that provide endpoint `/populate` to index records to Elasticsearch
+1. Build an api that provide endpoint `/suv` that return list of cars with the higher car boot volume
 
 ### Client-side (bonus)
 
