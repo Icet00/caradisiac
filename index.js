@@ -27,35 +27,66 @@ function insertWithBulk(toString)
 	});
 }
 
+
 //Populate function
 async function populate () {
 	var brands = await getBrands();
 	var toString = "";
 	var id = 0;
-	for(var i =0; i < 30; i++)//Change to 30 to brands.length but it is really long
+	var array_promise = [];
+	console.log("length : " + brands.length);
+	var counter_percentage = 0;
+	for(var i =0; i < 20; i++)//Change to 30 to brands.length but it is really long
 	{
 		var brand = brands[i];
-		if(!(typeof brand === "undefined"))
+		array_promise[i] = new Promise(function(resolve, reject)
 		{
-			var models = await getModels(brand);
-			models.forEach(function(element)
+			getModels(brand).then(function(models)
 			{
-				console.log(element);
-				toString += '{ "index":{ "_index": "suv", "_type":"suv", "_id": "'+id+'"} }\n';
-				toString += JSON.stringify(element)+"\n";
-				id++;
-			});			
-		}
-		console.log("percentage " + (i/30) + "%");
+				models.forEach(function(element)
+				{
+					try {
+						element.volume = parseInt(element.volume);
+						console.log(element);
+					}
+					catch(error) {
+						console.error(error);
+					}
+					toString += '{ "index":{ "_index": "suv", "_type":"suv", "_id": "'+id+'"} }\n';
+					toString += JSON.stringify(element)+"\n";
+					id++;
+				});	
+				counter_percentage++;
+				//console.log("Added - percentage done : " + ((counter_percentage/brands.length)*100).toFixed(0));
+				resolve();
+			})
+			.catch(function()
+			{
+				//In error case
+				counter_percentage++;
+				//console.log("Rejected - percentage done : " + ((counter_percentage/brands.length)*100).toFixed(0));
+				resolve();
+			});
+		});
 	}
-	console.log("finished the loading data");
-	fs.writeFile('value.json', toString, function (err) {
-		if (err) throw err;
+	
+	Promise.all(array_promise).then(function(values) {
+		console.log("finished the loading data");
+	    fs.writeFile('value.json', toString, function (err) {
+			if (err) throw err;
+		});
+		console.log("Writing finished");
+		insertWithBulk(toString);
 	});
-	console.log("Writing finished");
-	insertWithBulk(toString);
 }
 
+public function search()
+{
+	
+}
+
+//populate();
+/*
 //API route
 app.get('/', (req, res) => {
     res.send('Hello');
@@ -69,3 +100,4 @@ app.post('/populate', (req, res) => {
 app.listen(port);
 
 console.log("Server launch on port " + port);
+*/
